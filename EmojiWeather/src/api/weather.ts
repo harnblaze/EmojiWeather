@@ -1,33 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
-import { api } from '@/lib/api'
+import { getCurrentWeatherByCity } from './weatherApi'
 
-type WeatherResponse = {
-  current_weather?: {
-    temperature: number
-    windspeed: number
-    weathercode: number
-  }
-}
+type CurrentWeather = Awaited<ReturnType<typeof getCurrentWeatherByCity>>
 
-export function fetchWeatherByCoords(latitude: number, longitude: number) {
-  return api.get<WeatherResponse>('/forecast', {
-    params: {
-      latitude,
-      longitude,
-      current_weather: true,
-      timezone: 'auto',
-    },
-  })
-}
-
-export function useWeatherQuery(latitude: number | null, longitude: number | null) {
+export function useWeatherQuery(city: string, units: 'metric' | 'imperial') {
   return useQuery({
-    queryKey: ['weather', latitude, longitude],
-    queryFn: async () => {
-      if (latitude == null || longitude == null) throw new Error('no-coords')
-      const { data } = await fetchWeatherByCoords(latitude, longitude)
-      return data
-    },
-    enabled: latitude != null && longitude != null,
+    queryKey: ['weather', city, units],
+    queryFn: async (): Promise<CurrentWeather> => getCurrentWeatherByCity(city, units),
+    enabled: Boolean(city),
   })
 }

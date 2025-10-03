@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import './App.css'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { WeatherCard } from '@/components/WeatherCard'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -11,36 +12,21 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { useWeatherQuery } from '@/api/weather'
+import { useWeather } from '@/hooks/useWeather'
+import { useDebouncedValue } from '@/hooks/useDebouncedValue'
 
 function App() {
   const [city, setCity] = useState('Moscow')
   const [units, setUnits] = useState<'metric' | 'imperial'>('metric')
-  const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(null)
+  const debouncedCity = useDebouncedValue(city, 500)
+  const { data, isLoading, error, isFetching } = useWeather(debouncedCity, units)
+  const loading = isLoading || isFetching
 
-  useEffect(() => {
-    navigator.geolocation.getCurrentPosition(
-      pos => setCoords({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
-      () => setCoords({ lat: 55.7558, lon: 37.6173 }) // Москва по умолчанию
-    )
-  }, [])
-
-  const { data, isLoading } = useWeatherQuery(coords?.lat ?? null, coords?.lon ?? null)
-
-  const temperature = data?.current_weather?.temperature
-    ? units === 'metric'
-      ? `${Math.round(data.current_weather.temperature)}°C`
-      : `${Math.round((data.current_weather.temperature * 9) / 5 + 32)}°F`
-    : '—'
-  const wind = data?.current_weather?.windspeed
-    ? units === 'metric'
-      ? `${Math.round(data.current_weather.windspeed)} m/s`
-      : `${Math.round(data.current_weather.windspeed * 2.237)} mph`
-    : '—'
-  const condition = '—'
-  const humidity = '—'
-
-  const outfitEmoji = '🧥🧢' // пример: прохладно и дождь
+  const temperature =
+    typeof data?.main?.temp === 'number'
+      ? `${Math.round(data.main.temp)}${units === 'metric' ? '°C' : '°F'}`
+      : '—'
+  const condition = data?.weather?.[0]?.description ?? '—'
 
   return (
     <div className="mx-auto max-w-xl p-6 space-y-6">
@@ -68,26 +54,22 @@ function App() {
                 <SelectItem value="imperial">°F, mph</SelectItem>
               </SelectContent>
             </Select>
-            <Button disabled={isLoading}>Обновить</Button>
+            <Button disabled={loading}>Обновить</Button>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <div className="text-sm text-muted-foreground">Температура</div>
-              <div className="text-2xl font-medium">{temperature}</div>
-              <div className="text-sm text-muted-foreground">{condition}</div>
-            </div>
-            <div className="space-y-1">
-              <div className="text-sm text-muted-foreground">Ветер</div>
-              <div className="text-xl font-medium">{wind}</div>
-              <div className="text-sm text-muted-foreground">Влажность {humidity}</div>
-            </div>
-          </div>
+          <WeatherCard
+            city={data?.name || city}
+            temperature={temperature}
+            description={condition}
+            iconUrl={
+              data?.weather?.[0]?.icon
+                ? `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`
+                : null
+            }
+          />
 
-          <div className="pt-2">
-            <div className="text-sm text-muted-foreground">Рекомендуемая одежда</div>
-            <div className="text-3xl">{outfitEmoji}</div>
-          </div>
+          {loading && <div className="text-sm text-muted-foreground">Загрузка прогноза…</div>}
+          {error && <div className="text-sm text-destructive">Не удалось загрузить данные</div>}
         </CardContent>
       </Card>
     </div>
