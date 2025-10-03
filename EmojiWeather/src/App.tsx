@@ -3,6 +3,7 @@ import './App.css'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { WeatherCard } from '@/components/WeatherCard'
+import { WeatherCardSkeleton } from '@/components/WeatherCardSkeleton'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -67,18 +68,30 @@ function App() {
             </Button>
           </div>
 
-          <WeatherCard
-            city={data?.name || city}
-            temperature={temperature}
-            description={condition}
-            iconUrl={
-              data?.weather?.[0]?.icon
-                ? `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`
-                : null
-            }
-          />
-
-          {error && <div className="text-sm text-destructive">Не удалось загрузить данные</div>}
+          {isLoading || isFetching ? (
+            <WeatherCardSkeleton />
+          ) : error ? (
+            <Card>
+              <CardHeader>
+                <CardTitle>Погода</CardTitle>
+                <CardDescription>{city}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-sm text-destructive">Не удалось загрузить данные</div>
+              </CardContent>
+            </Card>
+          ) : (
+            <WeatherCard
+              city={data?.name || city}
+              temperature={temperature}
+              description={condition}
+              iconUrl={
+                data?.weather?.[0]?.icon
+                  ? `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`
+                  : null
+              }
+            />
+          )}
         </CardContent>
       </Card>
     </div>
