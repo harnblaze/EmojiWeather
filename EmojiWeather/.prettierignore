@@ -1,0 +1,13 @@
+dist
+node_modules
+coverage
+*.log
+*.lock
+package-lock.json
+build
+.turbo
+.next
+.vercel
+.idea
+.vscode
+
