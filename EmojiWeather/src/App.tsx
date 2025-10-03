@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { WeatherCard } from '@/components/WeatherCard'
 import { WeatherCardSkeleton } from '@/components/WeatherCardSkeleton'
-import { Input } from '@/components/ui/input'
+import { CitySearch } from '@/components/CitySearch'
 import {
   Select,
   SelectContent,
@@ -46,14 +46,7 @@ function App() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-2">
-            <Input
-              value={query}
-              onChange={e => setQuery(e.target.value)}
-              onKeyDown={e => {
-                if (e.key === 'Enter' && query.trim()) setCity(query.trim())
-              }}
-              placeholder="Город"
-            />
+            <CitySearch value={query} onValueChange={setQuery} placeholder="Выберите город..." />
             <Select value={units} onValueChange={v => setUnits(v as 'metric' | 'imperial')}>
               <SelectTrigger className="w-36">
                 <SelectValue placeholder="Единицы" />
@@ -64,7 +57,7 @@ function App() {
               </SelectContent>
             </Select>
             <Button disabled={loading || !query.trim()} onClick={() => setCity(query.trim())}>
-              Искать
+              Обновить
             </Button>
           </div>
 
