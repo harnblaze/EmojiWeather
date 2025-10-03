@@ -17,6 +17,7 @@ import { useDebouncedValue } from '@/hooks/useDebouncedValue'
 
 function App() {
   const [city, setCity] = useState('Moscow')
+  const [query, setQuery] = useState('Moscow')
   const [units, setUnits] = useState<'metric' | 'imperial'>('metric')
   const debouncedCity = useDebouncedValue(city, 500)
   const { data, isLoading, error, isFetching } = useWeather(debouncedCity, units)
@@ -44,7 +45,14 @@ function App() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-2">
-            <Input value={city} onChange={e => setCity(e.target.value)} placeholder="Город" />
+            <Input
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter' && query.trim()) setCity(query.trim())
+              }}
+              placeholder="Город"
+            />
             <Select value={units} onValueChange={v => setUnits(v as 'metric' | 'imperial')}>
               <SelectTrigger className="w-36">
                 <SelectValue placeholder="Единицы" />
@@ -54,7 +62,9 @@ function App() {
                 <SelectItem value="imperial">°F, mph</SelectItem>
               </SelectContent>
             </Select>
-            <Button disabled={loading}>Обновить</Button>
+            <Button disabled={loading || !query.trim()} onClick={() => setCity(query.trim())}>
+              Искать
+            </Button>
           </div>
 
           <WeatherCard
@@ -68,7 +78,6 @@ function App() {
             }
           />
 
-          {loading && <div className="text-sm text-muted-foreground">Загрузка прогноза…</div>}
           {error && <div className="text-sm text-destructive">Не удалось загрузить данные</div>}
         </CardContent>
       </Card>
