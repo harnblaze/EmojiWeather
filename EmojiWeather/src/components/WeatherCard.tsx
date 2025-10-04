@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { getClothingEmoji } from '@/utils/clothing'
+import { WeatherAvatar } from '@/components/WeatherAvatar'
 
 type Props = {
   city: string
@@ -13,8 +13,6 @@ type Props = {
 }
 
 export function WeatherCard({ city, temperature, description, iconUrl, weatherData }: Props) {
-  const clothingEmoji = weatherData ? getClothingEmoji(weatherData) : '👕'
-
   return (
     <Card>
       <CardHeader>
@@ -35,7 +33,9 @@ export function WeatherCard({ city, temperature, description, iconUrl, weatherDa
         </div>
         <div className="mt-4 pt-4 border-t">
           <div className="text-sm text-muted-foreground">Рекомендуемая одежда</div>
-          <div className="text-2xl mt-1">{clothingEmoji}</div>
+          <div className="mt-2">
+            <WeatherAvatar weatherData={weatherData} />
+          </div>
         </div>
       </CardContent>
     </Card>

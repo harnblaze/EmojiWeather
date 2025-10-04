@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { WeatherCard } from '@/components/WeatherCard'
 import { WeatherCardSkeleton } from '@/components/WeatherCardSkeleton'
 import { CitySearch } from '@/components/CitySearch'
+import { WeatherTestPanel } from '@/components/WeatherTestPanel'
 import {
   Select,
   SelectContent,
@@ -94,6 +95,8 @@ function App() {
           )}
         </CardContent>
       </Card>
+
+      <WeatherTestPanel />
     </div>
   )
 }
