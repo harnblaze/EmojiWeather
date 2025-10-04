@@ -46,9 +46,11 @@ function App() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-2">
-            <CitySearch value={query} onValueChange={setQuery} placeholder="Выберите город..." />
+            <div className="flex-1 min-w-0">
+              <CitySearch value={query} onValueChange={setQuery} placeholder="Выберите город..." />
+            </div>
             <Select value={units} onValueChange={v => setUnits(v as 'metric' | 'imperial')}>
-              <SelectTrigger className="w-36">
+              <SelectTrigger className="w-36 flex-shrink-0">
                 <SelectValue placeholder="Единицы" />
               </SelectTrigger>
               <SelectContent>
@@ -56,7 +58,11 @@ function App() {
                 <SelectItem value="imperial">°F, mph</SelectItem>
               </SelectContent>
             </Select>
-            <Button disabled={loading || !query.trim()} onClick={() => setCity(query.trim())}>
+            <Button
+              disabled={loading || !query.trim()}
+              onClick={() => setCity(query.trim())}
+              className="flex-shrink-0"
+            >
               Обновить
             </Button>
           </div>
