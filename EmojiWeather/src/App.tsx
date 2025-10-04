@@ -89,6 +89,7 @@ function App() {
                   ? `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`
                   : null
               }
+              weatherData={data}
             />
           )}
         </CardContent>
